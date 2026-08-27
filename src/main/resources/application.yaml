@@ -1,3 +1,66 @@
+server:
+  forward-headers-strategy: framework
+  reactive:
+    session:
+      cookie:
+        name: ${SESSION_COOKIE_NAME:__Host-TUTORFLOW_SESSION}
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:true}
+        same-site: lax
+        path: /
+
 spring:
   application:
     name: auth-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL:false}
+  session:
+    timeout: ${SESSION_IDLE_TIMEOUT:7d}
+    data:
+      redis:
+        namespace: tutorflow:spring:session
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: tutorflow-api
+              uri: ${TUTORFLOW_URI:http://localhost:8081}
+              predicates:
+                - Path=/api/**
+              filters:
+                - StripPrefix=1
+                - BffTokenRelay
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+tutorflow:
+  auth:
+    registration-id: zitadel
+    frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+    login-success-uri: ${LOGIN_SUCCESS_URI:http://localhost:5173/auth/callback}
+    login-failure-uri: ${LOGIN_FAILURE_URI:http://localhost:5173/auth/error}
+    token:
+      refresh-ahead: ${TOKEN_REFRESH_AHEAD:60s}
+      connect-timeout: ${TOKEN_CONNECT_TIMEOUT:2s}
+      response-timeout: ${TOKEN_RESPONSE_TIMEOUT:5s}
+    zitadel:
+      issuer-uri: ${ZITADEL_ISSUER_URI:http://localhost:8080}
+      authorization-uri: ${ZITADEL_AUTHORIZATION_URI:${ZITADEL_ISSUER_URI:http://localhost:8080}/oauth/v2/authorize}
+      token-uri: ${ZITADEL_TOKEN_URI:${ZITADEL_ISSUER_URI:http://localhost:8080}/oauth/v2/token}
+      jwk-set-uri: ${ZITADEL_JWK_SET_URI:${ZITADEL_ISSUER_URI:http://localhost:8080}/oauth/v2/keys}
+      user-info-uri: ${ZITADEL_USER_INFO_URI:${ZITADEL_ISSUER_URI:http://localhost:8080}/oidc/v1/userinfo}
+      client-id: ${ZITADEL_CLIENT_ID:tutorflow-local-development-client}
+      organization-id: ${ZITADEL_ORGANIZATION_ID:local-development-organization}
+      tutorflow-project-id: ${ZITADEL_TUTORFLOW_PROJECT_ID:local-development-project}
