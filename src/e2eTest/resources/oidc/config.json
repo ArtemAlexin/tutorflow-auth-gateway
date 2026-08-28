@@ -1,0 +1,20 @@
+{
+  "interactiveLogin": true,
+  "rotateRefreshToken": true,
+  "tokenCallbacks": [
+    {
+      "issuerId": "default",
+      "tokenExpiry": 120,
+      "requestMappings": [
+        {
+          "requestParam": "code",
+          "match": "*",
+          "claims": {
+            "name": "E2E User",
+            "email": "e2e-user@example.test"
+          }
+        }
+      ]
+    }
+  ]
+}

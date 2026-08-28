@@ -39,8 +39,8 @@ dependencies {
     testImplementation platform('org.testcontainers:testcontainers-bom:2.0.5')
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     testImplementation 'org.testcontainers:testcontainers'
-    testImplementation 'org.testcontainers:testcontainers-mockserver'
-    testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.0.9'
+    testImplementation 'org.htmlunit:htmlunit:5.2.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -56,8 +56,6 @@ tasks.named('test') {
 
 sourceSets {
     e2eTest {
-        java.srcDir 'src/e2eTest/java'
-        resources.srcDir 'src/e2eTest/resources'
         compileClasspath += sourceSets.main.output
         runtimeClasspath += output + compileClasspath
     }
